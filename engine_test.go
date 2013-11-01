@@ -7,7 +7,7 @@ import (
 
 type mockPost struct {
 	content []byte
-	format  string
+  isMarkdown bool
 }
 
 func (m *mockPost) GetContent() []byte {
@@ -15,11 +15,11 @@ func (m *mockPost) GetContent() []byte {
 }
 
 func (m *mockPost) IsMarkdown() bool {
-	return m.format == "md"
+	return m.isMarkdown
 }
 
-var rawPost = &mockPost{[]byte("<h1>This is a test</h1>"), "raw"}
-var mdPost = &mockPost{[]byte("# This is a test"), "md"}
+var rawPost = &mockPost{[]byte("<h1>This is a test</h1>"), false}
+var mdPost = &mockPost{[]byte("# This is a test"), true}
 
 func TestRenderingRawPost(t *testing.T) {
 	engine := NewEngine()
