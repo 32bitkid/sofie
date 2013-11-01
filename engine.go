@@ -1,6 +1,8 @@
 package main
 
-type Engine interface{}
+type Engine interface {
+	Render(Post) string
+}
 
 func NewEngine() (engine Engine) {
 	engine = new(defaultEngine)
@@ -8,3 +10,7 @@ func NewEngine() (engine Engine) {
 }
 
 type defaultEngine struct{}
+
+func (e *defaultEngine) Render(post Post) string {
+	return post.GetContent()
+}
