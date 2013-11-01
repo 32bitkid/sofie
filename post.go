@@ -19,12 +19,12 @@ func (p *yamlPost) GetContent() []byte {
 }
 
 func (p *yamlPost) IsMarkdown() bool {
-  for _, ext := range markdownFormats {
-    if(ext == p.Format) {
-      return true;
-    }
-  }  
-  return false;
+	for _, ext := range markdownFormats {
+		if ext == p.Format {
+			return true
+		}
+	}
+	return false
 }
 
 func PostFromYaml(yaml []byte) (post Post, err error) {
