@@ -2,28 +2,20 @@ package main
 
 import "testing"
 
-var htmlPost = []byte(`
-content: <h1>This is a test<h1>
-`)
-
-func postWrapper(yaml []byte, t *testing.T) (post Post) {
-	post, err := PostFromYaml(yaml)
-
-	if err != nil {
-		t.Fail()
-	}
-
-	return
+type mockPost struct {
+	content string
 }
 
-type PostFn func(*testing.T) Post
+func (m *mockPost) GetContent() string {
+	return m.content
+}
 
-var testPost PostFn = func(t *testing.T) Post { return postWrapper(htmlPost, t) }
+var htmlPost = &mockPost{"<h1>This is a test</h1>"}
 
 func TestRenderingHtmlPost(t *testing.T) {
 	engine := NewEngine()
-	actual := engine.Render(testPost(t))
-	expected := "<h1>This is a test<h1>"
+	actual := engine.Render(htmlPost)
+	expected := "<h1>This is a test</h1>"
 	if actual != expected {
 		t.Errorf("Expected %q, got %q", expected, actual)
 	}
