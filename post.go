@@ -3,15 +3,20 @@ package main
 import "launchpad.net/goyaml"
 
 type Post interface {
-	GetContent() string
+	GetContent() []byte
+	IsMarkdown() bool
 }
 
 type yamlPost struct {
-	Content string
+	Content []byte
 }
 
-func (p *yamlPost) GetContent() string {
+func (p *yamlPost) GetContent() []byte {
 	return p.Content
+}
+
+func (p *yamlPost) IsMarkdown() bool {
+	return false
 }
 
 func PostFromYaml(yaml []byte) (post Post, err error) {
