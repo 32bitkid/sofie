@@ -1,3 +1,8 @@
 package main
 
-type Layout interface{}
+import "io"
+
+type Layout interface {
+	RenderBefore(io.Writer)
+	RenderAfter(io.Writer)
+}
