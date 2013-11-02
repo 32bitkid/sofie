@@ -1,9 +1,8 @@
 package main_test
 
 import (
-	"bytes"
 	. "github.com/32bitkid/sofie"
-	"testing"
+  "os"
 )
 
 type mockPost struct {
@@ -22,25 +21,14 @@ func (m *mockPost) IsMarkdown() bool {
 var rawPost = &mockPost{[]byte("<h1>This is a test</h1>"), false}
 var mdPost = &mockPost{[]byte("# This is a test"), true}
 
-func TestRenderingRawPost(t *testing.T) {
-	var buffer bytes.Buffer
-	NewEngine().Render(rawPost, &buffer)
-
-	actual := buffer.Bytes()
-	expected := []byte("<h1>This is a test</h1>")
-	if !bytes.Equal(actual, expected) {
-		t.Errorf("Expected %q, got %q", expected, actual)
-	}
+func ExampleEngine_Render_rawFormat() {
+	NewEngine().Render(rawPost, os.Stdout)
+  // Output:
+	// <h1>This is a test</h1>
 }
 
-func TestRenderingMarkdownPost(t *testing.T) {
-	var buffer bytes.Buffer
-
-	NewEngine().Render(mdPost, &buffer)
-	actual := buffer.Bytes()
-
-	expected := []byte("<h1>This is a test</h1>\n")
-	if !bytes.Equal(actual, expected) {
-		t.Errorf("Expected %q, got %q", expected, actual)
-	}
+func ExampleEngine_Render_markdownFormat() {
+	NewEngine().Render(mdPost, os.Stdout)
+  // Output:
+  // <h1>This is a test</h1>
 }
