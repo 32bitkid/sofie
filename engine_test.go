@@ -1,14 +1,14 @@
 package main_test
 
 import (
-  . "github.com/32bitkid/sofie"
 	"bytes"
+	. "github.com/32bitkid/sofie"
 	"testing"
 )
 
 type mockPost struct {
-	content []byte
-  isMarkdown bool
+	content    []byte
+	isMarkdown bool
 }
 
 func (m *mockPost) GetContent() []byte {
@@ -23,8 +23,10 @@ var rawPost = &mockPost{[]byte("<h1>This is a test</h1>"), false}
 var mdPost = &mockPost{[]byte("# This is a test"), true}
 
 func TestRenderingRawPost(t *testing.T) {
-	engine := NewEngine()
-	actual := engine.Render(rawPost)
+	var buffer bytes.Buffer
+	NewEngine().Render(rawPost, &buffer)
+
+	actual := buffer.Bytes()
 	expected := []byte("<h1>This is a test</h1>")
 	if !bytes.Equal(actual, expected) {
 		t.Errorf("Expected %q, got %q", expected, actual)
@@ -32,8 +34,11 @@ func TestRenderingRawPost(t *testing.T) {
 }
 
 func TestRenderingMarkdownPost(t *testing.T) {
-	engine := NewEngine()
-	actual := engine.Render(mdPost)
+	var buffer bytes.Buffer
+
+	NewEngine().Render(mdPost, &buffer)
+	actual := buffer.Bytes()
+
 	expected := []byte("<h1>This is a test</h1>\n")
 	if !bytes.Equal(actual, expected) {
 		t.Errorf("Expected %q, got %q", expected, actual)

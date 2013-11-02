@@ -1,9 +1,12 @@
 package main
 
-import md "github.com/russross/blackfriday"
+import (
+	md "github.com/russross/blackfriday"
+	"io"
+)
 
 type Engine interface {
-	Render(Post) []byte
+	Render(Post, io.Writer)
 }
 
 func NewEngine() (engine Engine) {
@@ -13,12 +16,13 @@ func NewEngine() (engine Engine) {
 
 type defaultEngine struct{}
 
-func (e *defaultEngine) Render(post Post) []byte {
+func (e *defaultEngine) Render(post Post, w io.Writer) {
 	content := post.GetContent()
 
-	if post.IsMarkdown() {
-		return md.MarkdownCommon(content)
+	switch {
+	case post.IsMarkdown():
+		w.Write(md.MarkdownCommon(content))
+	default:
+		w.Write(content)
 	}
-
-	return content
 }
