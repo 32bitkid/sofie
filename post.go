@@ -1,12 +1,12 @@
 package main
 
-import "launchpad.net/goyaml"
-
-var markdownFormats = [...]string{"md", "mdown", "markdown"}
+import (
+	"io"
+	"launchpad.net/goyaml"
+)
 
 type Post interface {
-	GetContent() []byte
-	IsMarkdown() bool
+	Render(io.Writer, Formatters)
 }
 
 type yamlPost struct {
@@ -14,17 +14,8 @@ type yamlPost struct {
 	Format  string
 }
 
-func (p *yamlPost) GetContent() []byte {
-	return []byte(p.Content)
-}
-
-func (p *yamlPost) IsMarkdown() bool {
-	for _, ext := range markdownFormats {
-		if ext == p.Format {
-			return true
-		}
-	}
-	return false
+func (p *yamlPost) Render(w io.Writer, f Formatters) {
+	w.Write(f.Fetch(p.Format)([]byte(p.Content)))
 }
 
 func PostFromYaml(yaml []byte) (post Post, err error) {

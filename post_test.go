@@ -1,61 +1,66 @@
 package main_test
 
 import (
-	"bytes"
 	. "github.com/32bitkid/sofie"
+	"io/ioutil"
+	"os"
 	"testing"
 )
 
-type postFn func(*testing.T) Post
-
-func TestGettingYamlContentFromPost(t *testing.T) {
-
+func TestParsingFromYaml(t *testing.T) {
 	yaml := []byte(`content: here is some content`)
 
-	post, err := PostFromYaml(yaml)
-
-	if err != nil {
-		t.Error(err)
-		return
-	}
-
-	actual := post.GetContent()
-	expected := []byte(`here is some content`)
-
-	if !bytes.Equal(actual, expected) {
-		t.Errorf("Expected %q, but got %q", expected, actual)
-	}
-}
-
-func TestUnspecifiedFormatOfPost(t *testing.T) {
-	yaml := []byte(`content: here is some content`)
-
-	post, err := PostFromYaml(yaml)
+	_, err := PostFromYaml(yaml)
 
 	if err != nil {
 		t.Error(err)
 	}
+}
 
-	if post.IsMarkdown() {
-		t.Error("Expected to not be markdown")
+func TestInvalidInput(t *testing.T) {
+	yaml := []byte(`!garbage@<this>is<garbage>`)
+
+	_, err := PostFromYaml(yaml)
+
+	if err == nil {
+		t.Error(err)
 	}
 }
 
-func TestPostIsMarkdown(t *testing.T) {
+func ExamplePost_Render_rawContent() {
+	yaml := []byte(`content: here is some content`)
+
+	post, _ := PostFromYaml(yaml)
+
+	formatters := FormatterList{
+		"": NoopFormatter,
+	}
+
+	post.Render(os.Stdout, formatters)
+	// Output:
+	// here is some content
+}
+
+func TestUsingADifferentFormatter(t *testing.T) {
 	yaml := []byte(`
-content: this is markdown
-format: md
+content: here is some content
+format: custom
 `)
 
-	post, err := PostFromYaml(yaml)
+	post, _ := PostFromYaml(yaml)
 
-	if err != nil {
-		t.Error(err)
-		return
+	formatterCalled := false
+
+	formatters := FormatterList{
+		"custom": func(data []byte) []byte {
+			formatterCalled = true
+			return data
+		},
 	}
 
-	if !post.IsMarkdown() {
-		t.Error("Expected post to be formatted with markdown")
-	}
+	post.Render(ioutil.Discard, formatters)
 
+	if formatterCalled != true {
+		t.Error("Specified formatter was not invoked!")
+	}
 }

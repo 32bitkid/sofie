@@ -7,20 +7,16 @@ import (
 )
 
 type mockPost struct {
-	content    []byte
-	isMarkdown bool
+	content []byte
+	format  string
 }
 
-func (m *mockPost) GetContent() []byte {
-	return m.content
+func (m *mockPost) Render(w io.Writer, f Formatters) {
+	w.Write(f.Fetch(m.format)(m.content))
 }
 
-func (m *mockPost) IsMarkdown() bool {
-	return m.isMarkdown
-}
-
-var rawPost = &mockPost{[]byte("<h1>This is a test</h1>"), false}
-var mdPost = &mockPost{[]byte("# This is a test"), true}
+var rawPost = &mockPost{[]byte("<h1>This is a test</h1>"), ""}
+var mdPost = &mockPost{[]byte("# This is a test"), "md"}
 
 func ExampleEngine_Render_rawFormat() {
 	NewEngine().Render(rawPost, os.Stdout)
